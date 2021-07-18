@@ -6,7 +6,7 @@ using RPG.Core;
 using RPG.Movement;
 using System;
 
-namespace RPG.control
+namespace RPG.Control
 {
     public class AIControler : MonoBehaviour
     {
