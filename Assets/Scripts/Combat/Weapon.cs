@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using RPG.Core;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,21 +14,55 @@ namespace RPG.Combat
         [SerializeField] float weaponDamage = 5f;
         [SerializeField] float weaponRange = 1.5f;
         [SerializeField] bool isRightHanded = true;
+        [SerializeField] Projectile projectile = null;
+
+        const string weaponName = "Weapon";
 
         public void Spawn(Transform righthandTransform,Transform lefthandTransform, Animator animator)
         {
-            if(equippedPrefab != null)
+            DestroyOleWepaon(righthandTransform, lefthandTransform);
+
+            if (equippedPrefab != null)
             {
                 Transform handTransform;
-                handTransform = isRightHanded ? righthandTransform : lefthandTransform ;
-                Instantiate(equippedPrefab, handTransform);
-
+                handTransform = GetTransform(righthandTransform, lefthandTransform);
+                GameObject weapon = Instantiate(equippedPrefab, handTransform);
+                weapon.name = weaponName;
             }
             if (animatorOverride != null)
             {
                 animator.runtimeAnimatorController = animatorOverride;
 
             }
+        }
+
+        private static void DestroyOleWepaon(Transform righthandTransform, Transform lefthandTransform)
+        {
+            Transform oldWeapon = righthandTransform.Find(weaponName);
+            if(oldWeapon == null)
+            {
+                oldWeapon = lefthandTransform.Find(weaponName);
+            }
+            if (oldWeapon == null)
+                return;
+            oldWeapon.name = "DESTROYING";
+            Destroy(oldWeapon.gameObject);
+        }
+
+        private Transform GetTransform(Transform righthandTransform, Transform lefthandTransform)
+        {
+            return isRightHanded ? righthandTransform : lefthandTransform;
+        }
+
+        public bool HasProjectile()
+        {
+            return projectile != null;
+        }
+
+        public void LanchProjectile(Transform righthand, Transform lefthand, Health target)
+        {
+            Projectile projectileInstance = Instantiate(projectile, GetTransform(righthand, lefthand).position, Quaternion.identity);
+            projectileInstance.SetTarget(target, weaponDamage);
         }
 
 
